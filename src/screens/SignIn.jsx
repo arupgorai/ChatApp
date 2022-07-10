@@ -26,9 +26,7 @@ const SignIn = () => {
   const handlePress = async () => {
     if (mode === "signup") {
       await signUp(email, password);
-    }
-
-    if (mode === "signin") {
+    } else if (mode === "signin") {
       await signIn(email, password);
     }
   };
