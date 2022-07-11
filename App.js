@@ -1,13 +1,16 @@
 import { StatusBar } from "expo-status-bar";
-import { Text, LogBox } from "react-native";
+import { Text, LogBox, SafeAreaView, View } from "react-native";
 import { useAssets } from "expo-asset";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { auth } from "./firebase.config";
 import SignIn from "./src/screens/SignIn";
 import ContextWrapper from "./src/context/ContextWrapper";
+import Context from "./src/context/Context";
+import Profile from "./src/screens/Profile";
+import Home from "./src/screens/Home";
 
 LogBox.ignoreLogs([
   "Setting a timer",
@@ -19,6 +22,10 @@ const Stack = createStackNavigator();
 function App() {
   const [user, setUser] = useState(null);
   const [isLoading, setLoading] = useState(true);
+
+  const {
+    theme: { colors },
+  } = useContext(Context);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -43,7 +50,29 @@ function App() {
           <Stack.Screen name="SIGN_IN" component={SignIn} />
         </Stack.Navigator>
       ) : (
-        <Text>Hello user</Text>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: colors.forground,
+              shadowOffset: 0,
+              elevation: 0,
+            },
+            headerTintColor: colors.white,
+          }}
+        >
+          {!user.displayName && (
+            <Stack.Screen
+              name="PROFILE"
+              component={Profile}
+              options={{ headerShown: false }}
+            />
+          )}
+          <Stack.Screen
+            name="HOME"
+            options={{ title: "Chat App" }}
+            component={Home}
+          />
+        </Stack.Navigator>
       )}
     </NavigationContainer>
   );
